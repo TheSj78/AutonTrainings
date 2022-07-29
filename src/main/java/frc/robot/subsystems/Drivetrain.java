@@ -68,10 +68,28 @@ public class Drivetrain extends SubsystemBase {
     rightBack.follow(rightFront);
 
     gyro = new AHRS(SPI.Port.kMXP);
-    gyro.reset();
+    // reset in new thread since gyro needs some time to boot up and we don't 
+    // want to interfere with other code
+    new Thread(() -> {
+      try {
+        Thread.sleep(1000);
+        zeroHeading();
+      }
+      catch (Exception e)
+      {
+        System.out.println("Reset Gyro Failed");
+      }
+    }).start();
 
     // initialize all your Auton thingz below:
     // ____
+  }
+  
+  /**
+   * Reset the gyro
+   */
+  public void zeroHeading() {
+    gyro.reset();
   }
 
   /**
